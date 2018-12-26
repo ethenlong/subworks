@@ -1,0 +1,174 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+  <script type="text/javascript">
+	$(document).ready(function(){
+	   $("#publish").click(function(){
+    		$("#publish").disabled=true;
+  		});
+	  $("#items").change(function(){
+		  run_name=$("#items  option:selected").text();
+		  env = $("#env  option:selected").text();
+		  $.ajax({
+            url: "/query",
+            type: "POST",
+            data:{'run_name':run_name, 'env':env},
+            dataType: "json",
+            cache: false,
+            success: function(data) {
+                if (data.length > 0) {
+                   var myapp = data[0];
+				   console.log(myapp)
+				   $("input[name='pub_date']").val(getNowDate());
+				   $("input[name='git']").val(myapp['git']);
+				   $("input[name='run_name']").val(myapp['run_name']);
+				   $("input[name='apps_name']").val(myapp['apps_name']);
+				   $("input[name='tag']").val(myapp['tag']);
+				   $("input[name='env']").val(myapp['env']);
+				   $("input[name='server']").val(myapp['server']);
+				   $("input[name='port']").val(myapp['port']);
+                }
+				else alert("未发布"+env+"环境的APP");
+            }
+        });
+	  });
+	});
+	
+	function setData(e){
+		//run_name=$("#items  option:selected").text();
+		env2 = $("#env2").text();
+		console.log(e)
+		$.ajax({
+            url: "/query",
+            type: "POST",
+            data:{'run_name':e, 'env':env2},
+            dataType: "json",
+            cache: false,
+            success: function(data) {
+                if (data.length > 0) {
+                   var myapp = data[0];
+				   console.log(myapp)
+				   $("input[name='pub_date']").val(getNowDate());
+				   $("input[name='git']").val(myapp['git']);
+				   $("input[name='run_name']").val(myapp['run_name']);
+				   $("input[name='apps_name']").val(myapp['apps_name']);
+				   $("input[name='tag']").val(myapp['tag']);
+				   $("input[name='env']").val('');
+				   //$("input[name='env']").val(myapp['env']);
+				   $("input[name='server']").val(myapp['server']);
+				   $("input[name='port']").val(myapp['port']);
+                }
+            }
+        });
+	}
+	
+	function getNowDate() {
+		 var date = new Date();
+		 var sign1 = "-";
+		 var sign2 = ":";
+		 var year = date.getFullYear() // 年
+		 var month = date.getMonth() + 1; // 月
+		 var day  = date.getDate(); // 日
+		 var hour = date.getHours(); // 时
+		 var minutes = date.getMinutes(); // 分
+		 var seconds = date.getSeconds() //秒
+		 //var weekArr = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期天'];
+		 //var week = weekArr[date.getDay()];
+		 // 给一位数数据前面加 “0”
+		 if (month >= 1 && month <= 9) {
+		  month = "0" + month;
+		 }
+		 if (day >= 0 && day <= 9) {
+		  day = "0" + day;
+		 }
+		 if (hour >= 0 && hour <= 9) {
+		  hour = "0" + hour;
+		 }
+		 if (minutes >= 0 && minutes <= 9) {
+		  minutes = "0" + minutes;
+		 }
+		 if (seconds >= 0 && seconds <= 9) {
+		  seconds = "0" + seconds;
+		 }
+		 var currentdate = year + sign1 + month + sign1 + day + " " + hour + sign2 + minutes + sign2 + seconds;
+		 return currentdate;
+		}
+		console.log(getNowDate());
+	</script>
+	
+	<select class=add-entry id="env">
+		<option selected="selected" >qa</option>
+		<option >online</option>
+		<option >rd</option>
+	</select>
+	
+	<select class=add-entry id="items">
+		<option selected="selected" >请选择</option>
+		{% for sel in selects %}
+		<option value ={{sel}} >{{sel}}</option>
+		{% endfor %}
+	</select>
+	
+	
+    
+	<form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+	<pre>
+	<table>
+	<tr>
+        <td class=key_name>pub_date</td>
+        <td><input type=text size=30 name="pub_date"></td>
+		<td class=key_name>        git</td>
+        <td><input type=text size=30 name="git"></td>
+    </tr>
+    <tr>
+        <td class=key_name>dir_name</td>
+        <td><input type=text size=30 name=run_name></td>
+		<td class=key_name>        apps_name</td>
+        <td><input type=text size=30 name=apps_name></td>
+    </tr>
+	<tr>
+        <td class=key_name>tag</td>
+        <td><input type=text size=30 name=tag></td>
+		<td class=key_name>        env</td>
+        <td><input type=text size=30 name=env></td>
+    </tr>
+	<tr>
+        <td class=key_name>server</td>
+        <td><input type=text size=30 name=server></td>
+		<td class=key_name>        port</td>
+        <td><input type=text size=30 name=port></td>
+    </tr>
+	</table>
+	</pre>
+	<!--
+	  <dl>
+        <dt>Title:
+        <dd><input type=text size=30 name=title>
+        <dt>Text:
+        <dd><textarea name=text rows=5 cols=40></textarea>
+        <dd><input type=submit value=Share >
+      </dl>
+	  -->
+	 <dl>
+		<dd><input type=submit value="发布" id="publish">
+	 </dl>
+    </form>
+	
+  {% endif %}
+  <ul class=entries >
+  {% for entry in entries %}
+    <li><a href="javascript:void(0)" onclick="setData(this.text)" class=runname>{{ entry.run_name }}</a>
+	<br>{{ entry.git|safe }}
+	<br>
+	{{ entry.pub_date|safe }}
+	<br>
+	{{ entry.tag|safe }}
+	<br>
+	{{ entry.server|safe }}
+	<br>
+	<a class=env id="env2">{{ entry.env|safe }}</a>
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
