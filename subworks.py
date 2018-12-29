@@ -46,8 +46,11 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
-def publish(string):
-    os.system("sh ./subwork_publish.sh " + string)
+def publish(string, is_restart):
+    if is_restart == 'publish':
+        os.system("sh ./subwork_publish.sh " + string)
+    elif is_restart == 'on':
+        os.system("sh ./subworks_restart_app.sh " + string)
     text = os.popen("cat log.txt | grep error").read()
     flag = re.match(r'.*?error.*?', text)
     ret_text = os.popen("tail -n 1 log.txt").read()
@@ -72,11 +75,12 @@ def show_entries():
                "fanlai-device-web", "fanlai-sapp-web", "fanlai-manager"]
     return render_template('show_entries.html', entries=entries, selects=selects)
 
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['GET', 'POST'])
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
-    print(request.form['git'])
+    # print(request.form['git'])
+
     pub_date = request.form['pub_date']
     git = request.form['git']
     apps_name = request.form['apps_name']
@@ -85,7 +89,8 @@ def add_entry():
     server = request.form['server']
     run_name = request.form['run_name']
     port = request.form['port']
-
+    restart = request.form.get('restart') or 'publish'
+    print("action: "+restart)
     env_url = ''
     if env == 'qa':
         env_url = 'web.sh.fanlai.com'
@@ -96,18 +101,27 @@ def add_entry():
         p_string = git + " " + run_name + " " + apps_name + " " + tag + " " + env + " " + server
     else:
         p_string = git + " " + run_name + " " + apps_name + " " + tag + " " + env + " " + server + " " + port
-    flag, ret_text = publish(p_string)
-    if flag is True:
+    if session.get('userType') == 0:
+        flag, ret_text = publish(p_string, restart)
+    else:
+        flash(u'无权限，请联系管理员')
+        return redirect(url_for('show_entries'))
+    # if (flag is True) and (restart == 'on'):
+    #     flash(u'重启完成')
+    if (flag is True) and (restart == 'publish'):
         g.db.execute('insert into fl_pub (pub_date, git,apps_name,run_name,tag,env,server,port) values (?,?,?,?,?,?,?,?)',[pub_date, git, apps_name, run_name, tag, env, server, port])
         g.db.commit()
         if env != 'online':
-            sendmsg(env_url + "环境发布内容："+run_name+" "+tag+"\n"+"发布内容："+ret_text)
+            sendmsg(env_url + u"环境发布内容："+run_name+" "+tag+"\n"+u"发布内容："+ret_text)
             flash(u'发布成功')
         else:
             flash(u'online环境打包完成')
+    elif (flag is True) and (restart == 'on'):
+        # sendmsg(u'重启完成')
+        flash(u'重启完成')
+        # flash(u'发布失败，tag不对')
     else:
-        rsp = sendmsg(u'发布失败，tag不对')
-        print(rsp)
+        sendmsg(u'发布失败，tag不对')
         flash(u'发布失败，tag不对')
 
     return redirect(url_for('show_entries'))
@@ -127,19 +141,42 @@ def query():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('show_entries'))
+        username = request.form['username']
+        password = request.form['password']
+        if (username == '') or (password == ''):
+            error = u'用户名或密码不能为空'
+            return render_template('login.html', error=error)
+        cur = g.db.execute('select * from userinfo where username=?;', [username])
+        # print(cur.fetchall())
+        for row in cur.fetchall():
+            print(row)
+            if request.form['username'] != row[0]:
+                error = 'Invalid username'
+            elif request.form['password'] != row[1]:
+                error = 'Invalid password'
+            else:
+                session['logged_in'] = True
+                session['userType'] = row[2]
+                session['username'] = row[0]
+                print(session['userType'])
+                flash('You were logged in')
+                return redirect(url_for('show_entries'))
+    # if request.method == 'POST':
+    #     if request.form['username'] != app.config['USERNAME']:
+    #         error = 'Invalid username'
+    #     elif request.form['password'] != app.config['PASSWORD']:
+    #         error = 'Invalid password'
+    #     else:
+    #         session['logged_in'] = True
+    #         flash('You were logged in')
+    #         return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('userType', None)
+    session.pop('username', None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 

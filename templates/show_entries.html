@@ -3,6 +3,23 @@
   {% if session.logged_in %}
   <script type="text/javascript">
 	$(document).ready(function(){
+	   
+	   //$("input[name='restart']").on("change",function(){
+	   $("#restart").on("change",function(){
+	   
+			// alert("state changed");
+			var change = $("input[type='checkbox']").is(':checked'); //checkbox选中判断
+			console.log(change);
+			if (change){
+				$("#publish").val("重启");
+			
+			}else{
+				$("#publish").val("发布");
+			}
+			
+	   
+	   });
+	   
 	   $("#publish").click(function(){
     		$("#publish").disabled=true;
   		});
@@ -103,7 +120,7 @@
 	</select>
 	
 	<select class=add-entry id="items">
-		<option selected="selected" >请选择</option>
+		<option selected="selected" >请选择APP</option>
 		{% for sel in selects %}
 		<option value ={{sel}} >{{sel}}</option>
 		{% endfor %}
@@ -149,8 +166,9 @@
         <dd><input type=submit value=Share >
       </dl>
 	  -->
+	 
 	 <dl>
-		<dd><input type=submit value="发布" id="publish">
+		<dd><input type=checkbox  id="restart" name="restart">重启 <input type=submit value="发布" id="publish">
 	 </dl>
     </form>
 	

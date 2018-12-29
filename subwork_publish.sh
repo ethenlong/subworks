@@ -199,7 +199,7 @@ function publishOne(){
 					
 				;;
 				ws_manager.war)
-					pid94=$(ssh -p 3030 -n qingxin@$ip "ps -ef | grep tomcat9-4" | grep -v "grep" | awk '{print $2}')
+					pid94=$(ssh -p 3030 -n qingxin@$ip "ps -ef | grep tomcat9-4 | grep -v tail" | grep -v "grep" | awk '{print $2}')
 					if [ -n "$pid94" ];then
 						echo $pid94
 						ssh -p 3030 -n qingxin@$ip "kill -9 ${pid94}"
@@ -218,7 +218,7 @@ function publishOne(){
 					fi
 					scp -P 3030 $target qingxin@$ip:/usr/local/tomcat9-5/webapps/
 					
-					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-5/bin/catalina.sh start"
+					ssh -p 3030 -n qingxin@$ip "source /etc/profile; source /etc/bashrc; sh /usr/local/tomcat9-5/bin/catalina.sh start"
 					
 					#ssh -p 3030 -n qingxin@$6 "tail -f /usr/local/tomcat9-5/logs/catalina.out"
 				;;
@@ -267,7 +267,7 @@ function publishOne(){
 					fi
 					scp -P 3030 $target qingxin@$ip:/usr/local/tomcat9-1/webapps/
 					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-1/bin/catalina.sh start"
-					ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-1/logs/catalina.out"
+					#ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-1/logs/catalina.out"
 				;;
 				mall-api.war)
 					pid92=$(ssh -p 3030 -n qingxin@$ip "ps -ef | grep tomcat9-2" | grep -v "grep" | awk '{print $2}')
@@ -278,7 +278,7 @@ function publishOne(){
 					fi
 					scp -P 3030 $target qingxin@$ip:/usr/local/tomcat9-2/webapps/
 					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-2/bin/catalina.sh start"
-					ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-2/logs/catalina.out"
+					#ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-2/logs/catalina.out"
 				;;
 				device-api.war)
 					pid93=$(ssh -p 3030 -n qingxin@$ip "ps -ef | grep tomcat9-3" | grep -v "grep" | awk '{print $2}')
@@ -289,7 +289,7 @@ function publishOne(){
 					fi
 					scp -P 3030 $target qingxin@$ip:/usr/local/tomcat9-3/webapps/
 					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-3/bin/catalina.sh start"
-					ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-3/logs/catalina.out"
+					#ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-3/logs/catalina.out"
 					
 				;;
 				ws_manager.war)
@@ -301,7 +301,7 @@ function publishOne(){
 					fi
 					scp -P 3030 $target qingxin@$ip:/usr/local/tomcat9-4/webapps/
 					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-4/bin/catalina.sh start"
-					ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-4/logs/catalina.out"
+					#ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-4/logs/catalina.out"
 				;;
 				sapp-api.war)
 					pid95=$(ssh -p 3030 -n qingxin@$ip "ps -ef | grep tomcat9-5" | grep -v "grep" | awk '{print $2}')
@@ -314,7 +314,7 @@ function publishOne(){
 					
 					ssh -p 3030 -n qingxin@$ip "sh /usr/local/tomcat9-5/bin/catalina.sh start"
 					
-					ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-5/logs/catalina.out"
+					#ssh -p 3030 -n qingxin@$ip "tail -f /usr/local/tomcat9-5/logs/catalina.out"
 				;;
 				
 				

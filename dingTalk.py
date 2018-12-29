@@ -47,3 +47,5 @@ def sendmsg(text):
     print(rsp.text)
     return rsp.text
 # sendmsg("你好：")
+
+# wget --post-data="msgtype=text&text=hello"  https://oapi.dingtalk.com/robot/send?access_token=dec2f10d7f4da3faa8fdafdf6d707472e530a1d62c1eb4c894bd459e7f71fa51
