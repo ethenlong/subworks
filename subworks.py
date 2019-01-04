@@ -9,6 +9,19 @@ from config import devcfg
 import re
 from dingTalk import sendmsg
 
+import logging
+
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from tornado.options import define, options
+
+define('port', type=int, default=8111)
+# deploy or debug
+define('mode', default='debug')
+
+
+
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -180,5 +193,13 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+def main():
+    options.parse_command_line()
+    http_server = HTTPServer(WSGIContainer(app))
+    http_server.listen(options.port)
+    logging.warn("[UOP] App is running on: localhost:%d", options.port)
+    IOLoop.instance().start()
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8111)
+    main()
+    # app.run(host='0.0.0.0', port=8111)
