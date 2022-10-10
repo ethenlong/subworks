@@ -19,12 +19,12 @@ from tornado.options import define, options
 define('port', type=int, default=8111)
 # deploy or debug
 define('mode', default='debug')
-
+import cat
 
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 app = Flask(__name__)
 app.config.from_object(devcfg)
@@ -187,13 +187,21 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
-    session.pop('userType', None)
-    session.pop('username', None)
-    flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    with cat.Transaction('Transaction', 'logout') as t:
+        cat.log_event('sub event', 'logout event')
+        try:
+            session.pop('logged_in', None)
+            session.pop('userType', None)
+            session.pop('username', None)
+            flash('You were logged out')
+            return redirect(url_for('show_entries'))
+        except Exception:
+            t.set_status(cat.CAT_ERROR)
+        t.add_data('context sub')
+
 
 def main():
+    cat.init("subworks", debug=True)
     options.parse_command_line()
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(options.port)

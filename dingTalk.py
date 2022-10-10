@@ -4,8 +4,8 @@ import json
 import requests
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 def sendmsg(text):
     #1、构建url
