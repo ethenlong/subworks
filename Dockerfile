@@ -1,5 +1,7 @@
 # 基于的基础镜像
 FROM python:3.7.16-alpine
+
+VOLUME ["/data", "/data"]
 # 复制代码到code文件夹
 COPY . ../code
 # 设置code文件夹是工作目录
