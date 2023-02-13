@@ -10,7 +10,7 @@ COPY . /tmp/pycat
 
 WORKDIR /tmp/pycat
 
-ENV BUILD_ESSENTIALS="curl gcc linux-headers python python-dev libc-dev libffi-dev"
+ENV BUILD_ESSENTIALS="curl gcc linux-headers python3 python-dev libc-dev libffi-dev"
 
 RUN apk add $BUILD_ESSENTIALS && \
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
