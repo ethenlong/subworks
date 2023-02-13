@@ -190,6 +190,8 @@ def logout():
     with cat.Transaction('Transaction', 'logout') as t:
         cat.log_event('sub event', 'logout event')
         try:
+            # if session['username'] == 'qiaofeng':
+            #     raise Exception('error user qiaofeng')
             session.pop('logged_in', None)
             session.pop('userType', None)
             session.pop('username', None)
