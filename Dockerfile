@@ -15,9 +15,7 @@ ENV BUILD_ESSENTIALS="curl gcc linux-headers python python-dev libc-dev libffi-d
 RUN apk add $BUILD_ESSENTIALS && \
         curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
         python get-pip.py && rm get-pip.py && python setup.py install && \
-        apk del $BUILD_ESSENTIALS && \
-        pip install --upgrade pip && \
-        pip install -r requirements.txt && \
+        apk del $BUILD_ESSENTIALS
 
 WORKDIR /tmp/pycat
 
